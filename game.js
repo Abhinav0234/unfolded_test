@@ -84,12 +84,12 @@
     '########################################'
   ];
 
-  // Wall types and textures
+  // Wall types and textures - Brighter colors
   const WALL_TYPES = {
-    '#': { color: '#3d2914', texture: 'brick', height: 1 },
-    'D': { color: '#654321', texture: 'door', height: 0.8 },
-    'W': { color: '#87ceeb', texture: 'window', height: 0.6 },
-    'M': { color: '#c0c0c0', texture: 'mirror', height: 1 }
+    '#': { color: '#8d6944', texture: 'brick', height: 1 },      // Brighter brown walls
+    'D': { color: '#a57341', texture: 'door', height: 0.8 },      // Brighter door
+    'W': { color: '#b0d4eb', texture: 'window', height: 0.6 },    // Brighter window
+    'M': { color: '#e0e0e0', texture: 'mirror', height: 1 }       // Brighter mirror
   };
 
   // ============================================================================
@@ -1118,7 +1118,7 @@
     }
 
     _shadeColor(tile, distance, side) {
-      // Enhanced material system with different colors for different wall types
+      // Brighter material system with different colors for different wall types
       let base;
       
       if (WALL_TYPES[tile]) {
@@ -1127,30 +1127,33 @@
         const rgb = this._hexToRgb(color);
         base = [rgb.r, rgb.g, rgb.b];
       } else {
-        // Fallback colors based on tile type
+        // Brighter fallback colors based on tile type
         switch(tile) {
-          case 'E': base = this.caseClosed ? [36, 94, 72] : [120, 62, 44]; break;
-          case 'L': base = [255, 255, 200]; break;  // Light sources
-          case 'C': base = [150, 100, 200]; break; // Clue areas  
-          case 'R': base = [80, 40, 20]; break;    // Reception desk
-          case 'K': base = [60, 60, 80]; break;    // Kitchen
-          case 'B': base = [90, 90, 100]; break;   // Bathroom
-          case 'S': base = [100, 80, 60]; break;   // Stairs
-          case 'G': base = [40, 40, 60]; break;    // Ghost areas
-          default: base = [45, 35, 25]; break;     // Default hotel walls
+          case 'E': base = this.caseClosed ? [80, 180, 140] : [200, 120, 80]; break;
+          case 'L': base = [255, 255, 220]; break;  // Light sources
+          case 'C': base = [200, 150, 255]; break; // Clue areas  
+          case 'R': base = [150, 100, 60]; break;    // Reception desk
+          case 'K': base = [120, 120, 150]; break;    // Kitchen
+          case 'B': base = [150, 150, 170]; break;   // Bathroom
+          case 'S': base = [160, 140, 100]; break;   // Stairs
+          case 'G': base = [100, 100, 130]; break;    // Ghost areas
+          default: base = [120, 100, 80]; break;     // Brighter default hotel walls
         }
       }
       
-      // Enhanced lighting with more dramatic distance falloff
-      const shade = 1 / (1 + distance * 0.12);
-      const sideFactor = side === 1 ? 0.7 : 1; // More dramatic side shading
+      // Brighter lighting with less distance falloff
+      const shade = 1 / (1 + distance * 0.06); // Less aggressive falloff
+      const sideFactor = side === 1 ? 0.85 : 1; // Less dramatic side shading
       
       // Add subtle texture variation
-      const textureNoise = (Math.sin(distance * 10) * 0.1 + 1);
+      const textureNoise = (Math.sin(distance * 10) * 0.05 + 1);
       
-      const r = Math.min(255, base[0] * shade * sideFactor * textureNoise);
-      const g = Math.min(255, base[1] * shade * sideFactor * textureNoise);
-      const b = Math.min(255, base[2] * shade * sideFactor * textureNoise);
+      // Boost overall brightness
+      const brightnessFactor = 1.5;
+      
+      const r = Math.min(255, base[0] * shade * sideFactor * textureNoise * brightnessFactor);
+      const g = Math.min(255, base[1] * shade * sideFactor * textureNoise * brightnessFactor);
+      const b = Math.min(255, base[2] * shade * sideFactor * textureNoise * brightnessFactor);
       
       return `rgb(${r.toFixed(0)},${g.toFixed(0)},${b.toFixed(0)})`;
     }
@@ -1245,14 +1248,14 @@
     }
 
     _renderScene() {
-      // Enhanced atmosphere - darker, more foreboding
-      this.ctx.fillStyle = '#020305'; // Darker ceiling
+      // Brighter atmosphere - more visible environment
+      this.ctx.fillStyle = '#2a2a35'; // Lighter ceiling
       this.ctx.fillRect(0, 0, this.viewWidth, this.viewHeight / 2);
-      this.ctx.fillStyle = '#0a0503'; // Darker floor
+      this.ctx.fillStyle = '#3a2a1a'; // Lighter floor
       this.ctx.fillRect(0, this.viewHeight / 2, this.viewWidth, this.viewHeight / 2);
 
-      // Add fog/atmosphere layers
-      const fearFactor = this.fear * 0.3;
+      // Reduced fog for better visibility
+      const fearFactor = this.fear * 0.1; // Less fog intensity
       
       for (let column = 0; column < this.viewWidth; column++) {
         const rayAngle = this.player.angle - CONFIG.FOV / 2 + (column / this.viewWidth) * CONFIG.FOV;
@@ -1262,13 +1265,13 @@
         const wallHeight = Math.min(this.viewHeight, this.viewDistance / Math.max(0.0001, corrected));
         const top = (this.viewHeight - wallHeight) / 2;
         
-        // Enhanced wall rendering with shadows
+        // Brighter wall rendering
         this.ctx.fillStyle = this._shadeColor(hit.tile, corrected, hit.side);
         this.ctx.fillRect(column, top, 1, wallHeight);
         
-        // Add atmospheric fog based on distance and fear
-        const fogIntensity = Math.min(0.6, (corrected / 15) + fearFactor);
-        this.ctx.fillStyle = `rgba(8, 8, 12, ${fogIntensity})`;
+        // Much lighter fog for better visibility
+        const fogIntensity = Math.min(0.2, (corrected / 25) + fearFactor); // Reduced fog
+        this.ctx.fillStyle = `rgba(20, 20, 30, ${fogIntensity})`; // Lighter fog color
         this.ctx.fillRect(column, 0, 1, this.viewHeight);
       }
 
